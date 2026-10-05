@@ -1,6 +1,8 @@
 import { spawnSync } from "node:child_process";
 import { randomBytes } from "node:crypto";
 import * as fs from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
 import { LoginQRCallbackEventType } from "zca-js";
 import { hasStoredCredentials, loginWithCredentials, loginWithQR, logout } from "../zalo-client.js";
 import { displayQRFromPNG } from "../qr-display.js";
@@ -54,6 +56,28 @@ async function currentMainSha(): Promise<string | null> {
   }
 }
 
+/**
+ * Download the exact pinned package the plugin's mcp.json runs, so Codex's first
+ * start of the MCP server is served from the npx cache (Codex waits 10 s by default).
+ */
+function warmPluginServer(): void {
+  const codexHome = process.env.CODEX_HOME || path.join(os.homedir(), ".codex");
+  const pluginDir = path.join(codexHome, "plugins", "cache", "zalo-connector", "zalo");
+  try {
+    const versions = fs
+      .readdirSync(pluginDir)
+      .map((v) => path.join(pluginDir, v, "mcp.json"))
+      .filter((f) => fs.existsSync(f))
+      .sort((a, b) => fs.statSync(b).mtimeMs - fs.statSync(a).mtimeMs);
+    const server = JSON.parse(fs.readFileSync(versions[0], "utf-8")).mcpServers.zalo;
+    const args: string[] = server.args.filter((a: string) => a !== "stdio");
+    console.log("> Tải sẵn Zalo connector…");
+    spawnSync(server.command, args, { stdio: "ignore", shell: process.platform === "win32" });
+  } catch {
+    // Not fatal: Codex will download it on first start.
+  }
+}
+
 async function setup(): Promise<void> {
   const refIdx = process.argv.indexOf("--ref");
   // Pin the marketplace to an exact commit: later pushes to the repo do not reach this
@@ -68,6 +92,8 @@ async function setup(): Promise<void> {
   const ok =
     codex(["plugin", "marketplace", "add", MARKETPLACE_REPO, "--ref", ref]) &&
     codex(["plugin", "add", "zalo@zalo-connector"]);
+
+  if (ok) warmPluginServer();
 
   if (!ok) {
     console.error("\nCài plugin thất bại. Xem lỗi ở trên.");

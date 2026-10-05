@@ -25,7 +25,8 @@
 
 ## Codex plugin pin
 
-`plugins/zalo/mcp.json` runs `npx -y github:hiro-pna/zalo-connector#<commit-sha> stdio`.
+`plugins/zalo/mcp.json` runs `npx -y https://codeload.github.com/hiro-pna/zalo-connector/tar.gz/<commit-sha> stdio`
+(a tarball URL: immutable, and no git needed on the user's machine; `github:…#<sha>` fails in npm 10 with `GitFetcher requires an Arborist constructor`).
 After changing code:
 
 1. Commit and push the code change.
