@@ -1,0 +1,6 @@
+interface:
+  display_name: "Zalo"
+  short_description: "Nhắn tin, đọc nhóm, quản lý bạn bè Zalo"
+  default_prompt: "Dùng Zalo để giúp tôi"
+policy:
+  allow_implicit_invocation: true

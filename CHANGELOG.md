@@ -11,6 +11,7 @@ All notable changes to the zalo-personal OpenClaw extension will be documented i
   - `GET /healthz` endpoint.
 - **STDIO mode** (`zalo-mcp stdio`) for Codex / ChatGPT desktop: Codex launches it via `npx -y github:hiro-pna/zalo-connector stdio`; no server, tunnel or token.
 - **`zalo_login` / `zalo_login_status` tools**: QR login from inside the chat; the QR opens in the OS image viewer and is also returned as an image.
+- **Codex / ChatGPT plugin `zalo`** (`plugins/zalo/`, Agent Plugins 1.0.0): bundles the stdio MCP server and the `zalo` skill (login flow, recipient lookup, confirm-before-send rules, action reference). Repo marketplace at `.agents/plugins/marketplace.json`; install with `codex plugin marketplace add hiro-pna/zalo-connector` then `codex plugin add zalo@zalo-connector`.
 - `Dockerfile`, `CHATGPT.md` and `CODEX.md` setup guides.
 - GitHub Actions workflow that creates a GitHub Release with the `npm pack` tarball on `v*` tags.
 

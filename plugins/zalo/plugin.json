@@ -1,0 +1,21 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "zalo",
+  "version": "2.5.0",
+  "description": "Use a personal Zalo account from Codex / ChatGPT: send messages, read group chats, manage friends and groups. Bundles the zalo MCP server and the zalo skill.",
+  "author": { "name": "hiro-pna", "url": "https://github.com/hiro-pna" },
+  "homepage": "https://github.com/hiro-pna/zalo-connector",
+  "repository": "https://github.com/hiro-pna/zalo-connector",
+  "license": "MIT",
+  "keywords": ["zalo", "messaging", "vietnam", "mcp"],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Zalo",
+        "shortDescription": "Nhắn tin, đọc nhóm, quản lý bạn bè Zalo",
+        "longDescription": "Đăng nhập Zalo bằng mã QR ngay trong cuộc trò chuyện, rồi nhắn tin, đọc tin nhóm và quản lý bạn bè bằng tiếng Việt thông thường.",
+        "category": "Productivity"
+      }
+    }
+  }
+}
