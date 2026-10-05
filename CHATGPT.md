@@ -11,7 +11,7 @@ ChatGPT ──HTTPS──▶ Tunnel / reverse proxy ──HTTP──▶ zalo-mcp
 
 ## Yêu cầu
 
-- Node.js ≥ 20
+- Node.js ≥ 22 (khuyến nghị 24 LTS)
 - Một URL **HTTPS công khai** trỏ về server (ChatGPT không gọi được `localhost`)
 - Tài khoản ChatGPT có bật Developer mode cho connector
 

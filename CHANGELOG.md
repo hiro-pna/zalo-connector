@@ -15,6 +15,7 @@ All notable changes to the zalo-personal OpenClaw extension will be documented i
 ### Changed
 - Package renamed to `zalo-connector` for the `hiro-pna/zalo-connector` fork; repository URLs updated. Plugin id stays `zalo-personal`.
 - `openclaw` peer dependency is now optional.
+- Dependencies bumped: `zca-js` ^2.2.0, `sharp` ^0.35.5, `zod` ^4.6.5; Docker + CI on Node 24 LTS; `engines.node` >=22; Actions `checkout@v7`, `setup-node@v7`, `action-gh-release@v3`.
 
 ### Fixed
 - `saveCredentials` creates `~/.openclaw/` when missing (standalone installs).

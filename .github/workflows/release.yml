@@ -11,15 +11,15 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version: 24
       - run: npm install --no-audit --no-fund
       - name: Smoke test CLI
         run: node bin/zalo-mcp.mjs
       - run: npm pack
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           files: "*.tgz"
           generate_release_notes: true
