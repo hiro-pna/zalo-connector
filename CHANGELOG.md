@@ -2,6 +2,17 @@
 
 All notable changes to the zalo-personal OpenClaw extension will be documented in this file.
 
+## [2.5.1] - 2026-10-05
+
+### Security
+- **Read / write tool split**: `zalo_personal` is replaced by `zalo_read` (50 read-only actions, `readOnlyHint`) and `zalo_write` (94 actions that send or change state, `destructiveHint`). Codex requires user approval for every `zalo_write` call, so injected instructions in Zalo messages cannot send or change anything without a click. Each tool rejects actions that belong to the other.
+- **`ZALO_MCP_READONLY=1`**: exposes only `zalo_read` (stdio and HTTP).
+- **No login over HTTP**: `zalo_login` / `zalo_login_status` exist only in stdio mode, so a token holder cannot swap the server to another Zalo account.
+- **Pinned code**: the plugin's `mcp.json` runs the connector at a fixed commit; `setup` pins the marketplace to the current `main` commit (GitHub API, no git needed) and pins `@openai/codex` to 0.160.0. New pushes reach a machine only when `setup` is re-run.
+- **Locked dependencies**: `npm-shrinkwrap.json` (honoured by `npx` installs); Docker and CI use `npm ci`.
+- Credentials file `0600` / dir `0700`; QR in a private temp dir; Windows QR opened via `explorer.exe`; token never printed by `serve`.
+- Skill: Zalo message content is untrusted; never suggest "Allow and remember".
+
 ## [2.5.0] - 2026-10-05
 
 ### Added

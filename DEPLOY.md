@@ -23,6 +23,16 @@
 6. ✅ Pushes to GitHub (main branch + tags)
 7. ✅ Publishes to npm
 
+## Codex plugin pin
+
+`plugins/zalo/mcp.json` runs `npx -y github:hiro-pna/zalo-connector#<commit-sha> stdio`.
+After changing code:
+
+1. Commit and push the code change.
+2. Set the SHA in `plugins/zalo/mcp.json` to that commit.
+3. Bump `version` in `plugins/zalo/plugin.json` (Codex caches plugins by version).
+4. Commit and push; users re-run `npx -y github:hiro-pna/zalo-connector setup`.
+
 ## Before deploying
 
 Make sure:

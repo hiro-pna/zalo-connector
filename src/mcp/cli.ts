@@ -22,28 +22,51 @@ Environment (serve):
   HOST                     Listen host (default 0.0.0.0)
   ZALO_MCP_TOKEN           Required secret. Endpoint: /mcp/<token> or Bearer header
   ZALO_MCP_ALLOW_NO_AUTH=1 Run without a token (anyone with the URL controls your Zalo)
+
+Environment (stdio, serve):
+  ZALO_MCP_READONLY=1      Expose only zalo_read (no sending or changes)
 `;
 
 const MARKETPLACE_REPO = "hiro-pna/zalo-connector";
+// Pinned: setup must not pull whatever @openai/codex happens to be latest.
+const CODEX_CLI = "@openai/codex@0.160.0";
 
 /** Run the Codex CLI via npx, so no global `codex` install is needed. */
 function codex(args: string[]): boolean {
   console.log(`> codex ${args.join(" ")}`);
-  const r = spawnSync("npx", ["-y", "@openai/codex@latest", ...args], {
+  const r = spawnSync("npx", ["-y", CODEX_CLI, ...args], {
     stdio: "inherit",
     shell: process.platform === "win32",
   });
   return r.status === 0;
 }
 
-function setup(): void {
-  const refIdx = process.argv.indexOf("--ref");
-  const ref = refIdx > 0 ? process.argv[refIdx + 1] : undefined;
-  const marketplaceArgs = ["plugin", "marketplace", "add", MARKETPLACE_REPO, ...(ref ? ["--ref", ref] : [])];
+/** Commit SHA of the repo's default branch, so the install is pinned to what exists right now. */
+async function currentMainSha(): Promise<string | null> {
+  try {
+    const res = await fetch(`https://api.github.com/repos/${MARKETPLACE_REPO}/commits/HEAD`, {
+      headers: { accept: "application/vnd.github.sha" },
+    });
+    const sha = res.ok ? (await res.text()).trim() : "";
+    return /^[0-9a-f]{40}$/.test(sha) ? sha : null;
+  } catch {
+    return null;
+  }
+}
 
+async function setup(): Promise<void> {
+  const refIdx = process.argv.indexOf("--ref");
+  // Pin the marketplace to an exact commit: later pushes to the repo do not reach this
+  // machine until setup is run again.
+  const ref = refIdx > 0 ? process.argv[refIdx + 1] : await currentMainSha();
+  if (!ref) {
+    console.error("Không lấy được phiên bản từ GitHub. Kiểm tra mạng rồi chạy lại.");
+    process.exit(1);
+  }
+  // Re-add so a re-run moves the pin to the new commit (add alone keeps the old ref).
+  codex(["plugin", "marketplace", "remove", "zalo-connector"]);
   const ok =
-    codex(marketplaceArgs) &&
-    codex(["plugin", "marketplace", "upgrade", "zalo-connector"]) &&
+    codex(["plugin", "marketplace", "add", MARKETPLACE_REPO, "--ref", ref]) &&
     codex(["plugin", "add", "zalo@zalo-connector"]);
 
   if (!ok) {
@@ -70,6 +93,7 @@ async function serve(): Promise<void> {
   const port = Number(process.env.PORT ?? 8787);
   const host = process.env.HOST ?? "0.0.0.0";
   const token = process.env.ZALO_MCP_TOKEN?.trim() || null;
+  const readOnly = process.env.ZALO_MCP_READONLY === "1";
 
   if (!token && process.env.ZALO_MCP_ALLOW_NO_AUTH !== "1") {
     console.error("ZALO_MCP_TOKEN is required. Generate one with: zalo-mcp token");
@@ -84,7 +108,7 @@ async function serve(): Promise<void> {
   }
 
   await loginWithCredentials();
-  startMcpServer({ host, port, token });
+  startMcpServer({ host, port, token, readOnly });
 
   // Never print the token: server logs (Docker, Railway, tunnels) are often shared.
   const path = token ? "/mcp/<ZALO_MCP_TOKEN>" : "/mcp";
@@ -96,14 +120,18 @@ async function stdio(): Promise<void> {
   // stdout carries MCP messages: route all logging to stderr.
   console.log = console.error;
   console.info = console.error;
-  const server = buildMcpServer({ openQrViewer: true });
+  const server = buildMcpServer({
+    openQrViewer: true,
+    allowLogin: true,
+    readOnly: process.env.ZALO_MCP_READONLY === "1",
+  });
   await server.connect(new StdioServerTransport());
 }
 
 const command = process.argv[2];
 switch (command) {
   case "setup":
-    setup();
+    await setup();
     break;
   case "login":
     await login();

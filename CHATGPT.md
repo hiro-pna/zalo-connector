@@ -56,6 +56,7 @@ ChatGPT ──HTTPS──▶ Tunnel / reverse proxy ──HTTP──▶ zalo-mcp
 | `HOST` | `0.0.0.0` | Địa chỉ lắng nghe |
 | `ZALO_MCP_TOKEN` | — | Bắt buộc. Nhận qua path `/mcp/<token>` hoặc header `Authorization: Bearer <token>` |
 | `ZALO_MCP_ALLOW_NO_AUTH` | — | Đặt `1` để chạy không token (không khuyến nghị) |
+| `ZALO_MCP_READONLY` | — | Đặt `1` để chỉ có `zalo_read` |
 
 ## Endpoint
 
@@ -75,8 +76,15 @@ docker run -d -p 8787:8787 -v zalo-data:/root/.openclaw -e ZALO_MCP_TOKEN=<token
 
 ## Tool được expose
 
-Một tool duy nhất: `zalo_personal`, tham số `action` + các tham số tuỳ action
-(giống tool `zalo-personal` trong OpenClaw). Ví dụ:
+| Tool | Annotation | Nội dung |
+|---|---|---|
+| `zalo_read` | `readOnlyHint: true` | 50 thao tác chỉ đọc |
+| `zalo_write` | `destructiveHint: true` | 94 thao tác gửi / thay đổi. Tắt bằng `ZALO_MCP_READONLY=1` |
+
+`zalo_login` không có ở chế độ HTTP: người có token không thể đổi sang tài khoản Zalo khác.
+Đăng nhập bằng `zalo-mcp login` trên máy chạy server.
+
+Tham số: `action` + các tham số tuỳ action (giống tool `zalo-personal` trong OpenClaw). Ví dụ (`zalo_write`):
 
 ```json
 { "action": "send", "threadId": "Nguyễn Văn A", "message": "Chào bạn" }
