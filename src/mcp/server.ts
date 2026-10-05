@@ -3,6 +3,7 @@ import { timingSafeEqual } from "node:crypto";
 import { McpServer, createMcpHandler, fromJsonSchema } from "@modelcontextprotocol/server";
 import { toNodeHandler } from "@modelcontextprotocol/node";
 import { ZaloPersonalToolSchema, executeZaloPersonalTool } from "../tool.js";
+import { getLoginStatus, startQrLogin } from "./login.js";
 
 const TOOL_NAME = "zalo_personal";
 const TOOL_DESCRIPTION =
@@ -18,7 +19,13 @@ export type McpServerOptions = {
   token: string | null;
 };
 
-function buildMcpServer(): McpServer {
+const LOGIN_INPUT = fromJsonSchema({ type: "object", properties: {}, additionalProperties: false } as any);
+
+function text(t: string) {
+  return { type: "text" as const, text: t };
+}
+
+export function buildMcpServer(opts: { openQrViewer: boolean } = { openQrViewer: false }): McpServer {
   const server = new McpServer({ name: "zalo-connector", version: "2.5.0" });
 
   server.registerTool(
@@ -33,6 +40,58 @@ function buildMcpServer(): McpServer {
       const result = await executeZaloPersonalTool("mcp", args ?? {});
       const failed = Boolean((result.details as { error?: unknown } | undefined)?.error);
       return { content: result.content as any, isError: failed };
+    },
+  );
+
+  server.registerTool(
+    "zalo_login",
+    {
+      title: "Đăng nhập Zalo",
+      description:
+        "Log in to Zalo with a QR code. Call this when the user asks to log in, or when another Zalo tool says " +
+        "'Not authenticated'. Shows a QR code; the user scans it with the Zalo phone app and confirms. " +
+        "Then call zalo_login_status to check the result.",
+      inputSchema: LOGIN_INPUT,
+      annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: true },
+    },
+    async () => {
+      const current = await getLoginStatus();
+      if (current.status === "done") return { content: [text("Đã đăng nhập Zalo. Không cần quét QR.")] };
+
+      const s = await startQrLogin({ openViewer: opts.openQrViewer });
+      if (s.status !== "waiting") {
+        return { content: [text(`Không tạo được mã QR: ${s.status === "failed" ? s.error : s.status}`)], isError: true };
+      }
+      const where = opts.openQrViewer ? "Mã QR đã được mở trên màn hình" : "Mã QR ở ảnh bên dưới";
+      return {
+        content: [
+          text(
+            `${where} (file: ${s.qrPath}). Mở app Zalo trên điện thoại → biểu tượng quét QR → quét mã → bấm Đăng nhập. ` +
+              "Sau đó gọi zalo_login_status để xác nhận.",
+          ),
+          { type: "image" as const, data: s.qrBase64, mimeType: "image/png" },
+        ],
+      };
+    },
+  );
+
+  server.registerTool(
+    "zalo_login_status",
+    {
+      title: "Trạng thái đăng nhập Zalo",
+      description: "Check whether the Zalo account is logged in (after zalo_login).",
+      inputSchema: LOGIN_INPUT,
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
+    async () => {
+      const s = await getLoginStatus();
+      const msg = {
+        idle: "Chưa đăng nhập. Gọi zalo_login để lấy mã QR.",
+        waiting: `Đang chờ quét QR${s.status === "waiting" && s.scannedBy ? ` (đã quét bởi ${s.scannedBy}, chờ bấm xác nhận)` : ""}.`,
+        done: "Đã đăng nhập Zalo.",
+        failed: `Đăng nhập thất bại: ${s.status === "failed" ? s.error : ""}. Gọi zalo_login để thử lại.`,
+      }[s.status];
+      return { content: [text(msg)], isError: s.status === "failed" };
     },
   );
 

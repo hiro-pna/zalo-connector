@@ -3,13 +3,15 @@ import * as fs from "node:fs";
 import { LoginQRCallbackEventType } from "zca-js";
 import { hasStoredCredentials, loginWithCredentials, loginWithQR, logout } from "../zalo-client.js";
 import { displayQRFromPNG } from "../qr-display.js";
-import { startMcpServer } from "./server.js";
+import { StdioServerTransport } from "@modelcontextprotocol/server/stdio";
+import { buildMcpServer, startMcpServer } from "./server.js";
 
 const USAGE = `Usage: zalo-mcp <command>
 
 Commands:
   login    Scan a QR code with the Zalo app and save credentials
   logout   Delete saved credentials
+  stdio    Run as a local MCP server over stdio (Codex / ChatGPT desktop, Claude Desktop)
   serve    Start the MCP server (Streamable HTTP) for ChatGPT / other MCP clients
   token    Print a random token for ZALO_MCP_TOKEN
 
@@ -55,6 +57,14 @@ async function serve(): Promise<void> {
   console.log("Expose it over HTTPS (e.g. cloudflared, ngrok) and add that URL as a ChatGPT connector.");
 }
 
+async function stdio(): Promise<void> {
+  // stdout carries MCP messages: route all logging to stderr.
+  console.log = console.error;
+  console.info = console.error;
+  const server = buildMcpServer({ openQrViewer: true });
+  await server.connect(new StdioServerTransport());
+}
+
 const command = process.argv[2];
 switch (command) {
   case "login":
@@ -63,6 +73,9 @@ switch (command) {
   case "logout":
     await logout();
     console.log("Credentials deleted.");
+    break;
+  case "stdio":
+    await stdio();
     break;
   case "serve":
     await serve();
