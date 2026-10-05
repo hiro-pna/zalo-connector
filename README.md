@@ -15,6 +15,11 @@ Zalo App  <-->  zalo-personal extension  <-->  OpenClaw AI  <-->  Bạn
 
 ---
 
+## Dùng Với Codex / ChatGPT (MCP)
+
+- **Codex / ChatGPT desktop (dễ nhất):** cài plugin `zalo` — xem [CODEX.md](CODEX.md). Không cần server.
+- **ChatGPT web (connector qua HTTPS):** xem [CHATGPT.md](CHATGPT.md).
+
 ## Cài Đặt Nhanh
 
 ```bash

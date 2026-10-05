@@ -2,6 +2,28 @@
 
 All notable changes to the zalo-personal OpenClaw extension will be documented in this file.
 
+## [2.5.0] - 2026-10-05
+
+### Added
+- **MCP server for ChatGPT** (`bin/zalo-mcp.mjs`, `src/mcp/`), built on MCP TypeScript SDK v2 (`@modelcontextprotocol/server` + `@modelcontextprotocol/node`, `createMcpHandler`): exposes every `zalo-personal` action as one MCP tool `zalo_personal` over Streamable HTTP, so ChatGPT custom connectors (Developer mode) and other MCP clients can use the Zalo account without OpenClaw.
+  - CLI commands: `login` (QR), `logout`, `serve`, `token`.
+  - Auth: shared secret `ZALO_MCP_TOKEN` via `/mcp/<token>` path or `Authorization: Bearer` header.
+  - `GET /healthz` endpoint.
+- **STDIO mode** (`zalo-mcp stdio`) for Codex / ChatGPT desktop: Codex launches it via `npx -y github:hiro-pna/zalo-connector stdio`; no server, tunnel or token.
+- **`zalo_login` / `zalo_login_status` tools**: QR login from inside the chat; the QR opens in the OS image viewer and is also returned as an image.
+- **Codex / ChatGPT plugin `zalo`** (`plugins/zalo/`, Agent Plugins 1.0.0): bundles the stdio MCP server and the `zalo` skill (login flow, recipient lookup, confirm-before-send rules, action reference). Repo marketplace at `.agents/plugins/marketplace.json`; install with `codex plugin marketplace add hiro-pna/zalo-connector` then `codex plugin add zalo@zalo-connector`.
+- **`zalo-mcp setup`**: one command (`npx -y github:hiro-pna/zalo-connector setup`) adds the marketplace, upgrades it and installs the plugin via `npx @openai/codex`; can be run by Codex desktop itself from a single chat message. Idempotent; re-run to update.
+- `Dockerfile`, `CHATGPT.md` and `CODEX.md` setup guides.
+- GitHub Actions workflow that creates a GitHub Release with the `npm pack` tarball on `v*` tags.
+
+### Changed
+- Package renamed to `zalo-connector` for the `hiro-pna/zalo-connector` fork; repository URLs updated. Plugin id stays `zalo-personal`.
+- `openclaw` peer dependency is now optional.
+- Dependencies bumped: `zca-js` ^2.2.0, `sharp` ^0.35.5, `zod` ^4.6.5; Docker + CI on Node 24 LTS; `engines.node` >=22; Actions `checkout@v7`, `setup-node@v7`, `action-gh-release@v3`.
+
+### Fixed
+- `saveCredentials` creates `~/.openclaw/` when missing (standalone installs).
+
 ## [2.4.2] - 2026-07-15
 
 ### Added

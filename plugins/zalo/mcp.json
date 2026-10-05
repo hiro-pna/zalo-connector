@@ -1,0 +1,10 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "zalo": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "github:hiro-pna/zalo-connector", "stdio"]
+    }
+  }
+}
