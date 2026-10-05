@@ -1,5 +1,5 @@
-import { readFileSync, writeFileSync, unlinkSync, existsSync } from "node:fs";
-import { join } from "node:path";
+import { readFileSync, writeFileSync, unlinkSync, existsSync, mkdirSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { homedir } from "node:os";
 
 const CREDENTIALS_PATH = join(homedir(), ".openclaw", "zalo-personal-credentials.json");
@@ -12,6 +12,7 @@ export type ZaloPersonalCredentials = {
 };
 
 export function saveCredentials(data: ZaloPersonalCredentials): void {
+  mkdirSync(dirname(CREDENTIALS_PATH), { recursive: true });
   writeFileSync(CREDENTIALS_PATH, JSON.stringify(data, null, 2), "utf-8");
 }
 

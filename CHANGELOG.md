@@ -2,6 +2,23 @@
 
 All notable changes to the zalo-personal OpenClaw extension will be documented in this file.
 
+## [2.5.0] - 2026-10-05
+
+### Added
+- **MCP server for ChatGPT** (`bin/zalo-mcp.mjs`, `src/mcp/`): exposes every `zalo-personal` action as one MCP tool `zalo_personal` over Streamable HTTP, so ChatGPT custom connectors (Developer mode) and other MCP clients can use the Zalo account without OpenClaw.
+  - CLI commands: `login` (QR), `logout`, `serve`, `token`.
+  - Auth: shared secret `ZALO_MCP_TOKEN` via `/mcp/<token>` path or `Authorization: Bearer` header.
+  - `GET /healthz` endpoint.
+- `Dockerfile` and `CHATGPT.md` setup guide.
+- GitHub Actions workflow that creates a GitHub Release with the `npm pack` tarball on `v*` tags.
+
+### Changed
+- Package renamed to `zalo-connector` for the `hiro-pna/zalo-connector` fork; repository URLs updated. Plugin id stays `zalo-personal`.
+- `openclaw` peer dependency is now optional.
+
+### Fixed
+- `saveCredentials` creates `~/.openclaw/` when missing (standalone installs).
+
 ## [2.4.2] - 2026-07-15
 
 ### Added

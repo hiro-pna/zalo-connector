@@ -15,6 +15,10 @@ Zalo App  <-->  zalo-personal extension  <-->  OpenClaw AI  <-->  Bạn
 
 ---
 
+## Dùng Với ChatGPT (MCP)
+
+Xem [CHATGPT.md](CHATGPT.md) để chạy MCP server và thêm connector trong ChatGPT.
+
 ## Cài Đặt Nhanh
 
 ```bash

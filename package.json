@@ -1,10 +1,13 @@
 {
-  "name": "zalo-personal",
-  "version": "2.4.3",
-  "description": "OpenClaw extension for Zalo Personal Account via zca-js library. Login via QR code, no CLI tools needed. Works with OpenClaw 2026.2+",
+  "name": "zalo-connector",
+  "version": "2.5.0",
+  "description": "Zalo personal account connector (zca-js): OpenClaw extension + MCP server for ChatGPT and other MCP clients. Login via QR code.",
   "type": "module",
   "main": "./index.ts",
-  "author": "caochitam <caochitam@gmail.com>",
+  "bin": {
+    "zalo-mcp": "./bin/zalo-mcp.mjs"
+  },
+  "author": "hiro-pna (fork of caochitam/zalo-personal)",
   "license": "MIT",
   "keywords": [
     "openclaw",
@@ -14,17 +17,21 @@
     "vietnam",
     "messaging",
     "chatbot",
-    "qr-login"
+    "qr-login",
+    "mcp",
+    "chatgpt",
+    "model-context-protocol"
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/caochitam/zalo-personal.git"
+    "url": "git+https://github.com/hiro-pna/zalo-connector.git"
   },
   "bugs": {
-    "url": "https://github.com/caochitam/zalo-personal/issues"
+    "url": "https://github.com/hiro-pna/zalo-connector/issues"
   },
-  "homepage": "https://github.com/caochitam/zalo-personal#readme",
+  "homepage": "https://github.com/hiro-pna/zalo-connector#readme",
   "files": [
+    "bin/",
     "src/",
     "script/",
     "README.md",
@@ -38,16 +45,29 @@
     "zalo-group.jpg",
     "momo-caochitam.jpg"
   ],
-  "scripts": {},
+  "scripts": {
+    "mcp": "node bin/zalo-mcp.mjs serve",
+    "login": "node bin/zalo-mcp.mjs login"
+  },
+  "engines": {
+    "node": ">=20"
+  },
   "peerDependencies": {
     "openclaw": ">=2026.2.0"
   },
+  "peerDependenciesMeta": {
+    "openclaw": {
+      "optional": true
+    }
+  },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1",
     "@sinclair/typebox": "0.34.48",
     "jsqr": "^1.4.0",
     "pngjs": "^7.0.0",
     "qrcode-terminal": "^0.12.0",
     "sharp": "^0.34.5",
+    "tsx": "^4.23.15",
     "zca-js": "^2.1.0",
     "zod": "^4.3.6"
   },
