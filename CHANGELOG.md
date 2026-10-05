@@ -5,7 +5,7 @@ All notable changes to the zalo-personal OpenClaw extension will be documented i
 ## [2.5.0] - 2026-10-05
 
 ### Added
-- **MCP server for ChatGPT** (`bin/zalo-mcp.mjs`, `src/mcp/`): exposes every `zalo-personal` action as one MCP tool `zalo_personal` over Streamable HTTP, so ChatGPT custom connectors (Developer mode) and other MCP clients can use the Zalo account without OpenClaw.
+- **MCP server for ChatGPT** (`bin/zalo-mcp.mjs`, `src/mcp/`), built on MCP TypeScript SDK v2 (`@modelcontextprotocol/server` + `@modelcontextprotocol/node`, `createMcpHandler`): exposes every `zalo-personal` action as one MCP tool `zalo_personal` over Streamable HTTP, so ChatGPT custom connectors (Developer mode) and other MCP clients can use the Zalo account without OpenClaw.
   - CLI commands: `login` (QR), `logout`, `serve`, `token`.
   - Auth: shared secret `ZALO_MCP_TOKEN` via `/mcp/<token>` path or `Authorization: Bearer` header.
   - `GET /healthz` endpoint.
