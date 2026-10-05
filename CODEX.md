@@ -33,6 +33,11 @@ Lệnh `setup` làm 3 việc:
 Lệnh `codex` được chạy qua `npx @openai/codex`, nên máy không cần cài sẵn Codex CLI.
 Chạy lại `setup` bất cứ lúc nào để cập nhật plugin.
 
+**Ghim phiên bản:** `setup` ghim marketplace vào commit hiện tại của `main`. Plugin chạy connector ở một commit cố định (`mcp.json`).
+Thay đổi mới trên GitHub không tự chạy trên máy cho tới khi chạy lại `setup`.
+
+**Chế độ chỉ đọc:** thêm biến môi trường `ZALO_MCP_READONLY=1` để tắt hẳn `zalo_write`.
+
 ## B. Sử dụng hằng ngày
 
 Chỉ cần gõ tiếng Việt bình thường trong Codex.
@@ -55,7 +60,19 @@ Chỉ cần gõ tiếng Việt bình thường trong Codex.
 | Lời mời kết bạn | "Có ai gửi lời mời kết bạn không?" |
 | Nhắc lịch nhóm | "Nhắc nhóm Gia Đình 8h tối mai gọi video" |
 
-Trước khi gửi, Codex luôn hỏi lại người nhận và nội dung. Trả lời **"ok"** để gửi, hoặc sửa lại nếu sai.
+Trước khi gửi, Codex luôn hỏi lại người nhận và nội dung:
+
+1. Đọc kỹ tên người nhận và nội dung.
+2. Đúng thì trả lời **"ok"**. Sai thì gõ lại cho đúng.
+3. Codex hiện nút duyệt: bấm **Allow / Cho phép**.
+
+> ⚠️ Không bấm **"Allow and remember" / "Luôn cho phép"**.
+> Nếu bấm, Codex tự gửi tin mà không hỏi lại trong cả phiên làm việc.
+
+**An toàn:**
+
+- Tin nhắn trong nhóm do người khác viết. Nếu Codex đề nghị làm theo nội dung một tin nhắn (chuyển tiếp, gửi mã, chạy lệnh), bấm **Deny / Từ chối**.
+- Không ai được gửi tin thay bạn nếu bạn chưa bấm duyệt.
 
 **Không làm được:**
 
@@ -91,7 +108,8 @@ Muốn có skill: copy thư mục `plugins/zalo/skills/zalo` vào `~/.agents/ski
 |---|---|
 | `zalo_login` | Tạo mã QR, mở trên màn hình |
 | `zalo_login_status` | Kiểm tra đã đăng nhập chưa |
-| `zalo_personal` | 141 thao tác Zalo (gửi tin, nhóm, bạn bè, …) |
+| `zalo_read` | 50 thao tác chỉ đọc. Chạy không cần duyệt |
+| `zalo_write` | 94 thao tác gửi / thay đổi. Codex hỏi duyệt mỗi lần |
 
 ## Xử lý sự cố
 

@@ -1,7 +1,7 @@
 FROM node:24-slim
 WORKDIR /app
-COPY package.json ./
-RUN npm install --omit=dev --omit=peer --no-audit --no-fund
+COPY package.json npm-shrinkwrap.json ./
+RUN npm ci --omit=dev --omit=peer --no-audit --no-fund
 COPY . .
 ENV PORT=8787 HOST=0.0.0.0
 EXPOSE 8787

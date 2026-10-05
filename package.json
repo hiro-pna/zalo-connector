@@ -1,6 +1,6 @@
 {
   "name": "zalo-connector",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "description": "Zalo personal account connector (zca-js): OpenClaw extension + MCP server for ChatGPT and other MCP clients. Login via QR code.",
   "type": "module",
   "main": "./index.ts",

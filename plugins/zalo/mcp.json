@@ -4,7 +4,11 @@
     "zalo": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "github:hiro-pna/zalo-connector", "stdio"]
+      "args": [
+        "-y",
+        "https://codeload.github.com/hiro-pna/zalo-connector/tar.gz/6b8d1f5acab22c43b98b7fd878454d90e50c8cde",
+        "stdio"
+      ]
     }
   }
 }

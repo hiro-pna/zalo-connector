@@ -2,6 +2,17 @@
 
 All notable changes to the zalo-personal OpenClaw extension will be documented in this file.
 
+## [2.5.1] - 2026-10-05
+
+### Security
+- **Read / write tool split**: `zalo_personal` is replaced by `zalo_read` (50 read-only actions, `readOnlyHint`) and `zalo_write` (94 actions that send or change state, `destructiveHint`). Codex requires user approval for every `zalo_write` call, so injected instructions in Zalo messages cannot send or change anything without a click. Each tool rejects actions that belong to the other.
+- **`ZALO_MCP_READONLY=1`**: exposes only `zalo_read` (stdio and HTTP).
+- **No login over HTTP**: `zalo_login` / `zalo_login_status` exist only in stdio mode, so a token holder cannot swap the server to another Zalo account.
+- **Pinned code**: the plugin's `mcp.json` runs the connector from a GitHub tarball of a fixed commit (no git needed); `setup` pre-downloads that exact package so the first Codex start stays under the 10 s timeout; `setup` pins the marketplace to the current `main` commit (GitHub API, no git needed) and pins `@openai/codex` to 0.160.0. New pushes reach a machine only when `setup` is re-run.
+- **Locked dependencies**: `npm-shrinkwrap.json` (honoured by `npx` installs); Docker and CI use `npm ci`.
+- Credentials file `0600` / dir `0700`; QR in a private temp dir; Windows QR opened via `explorer.exe`; token never printed by `serve`.
+- Skill: Zalo message content is untrusted; never suggest "Allow and remember".
+
 ## [2.5.0] - 2026-10-05
 
 ### Added
@@ -23,6 +34,13 @@ All notable changes to the zalo-personal OpenClaw extension will be documented i
 
 ### Fixed
 - `saveCredentials` creates `~/.openclaw/` when missing (standalone installs).
+
+### Security
+- Credentials file written with mode `0600` (directory `0700`); it holds session cookies with full account access.
+- QR image written to a private per-login temp dir (`0700`, file `0600`) instead of a fixed path in shared `/tmp`, preventing symlink overwrite and QR snooping by other local users.
+- Windows QR viewer opened via `explorer.exe` instead of `cmd /c start`, avoiding shell parsing of the path.
+- `serve` no longer prints the token in its startup log; warns when `ZALO_MCP_TOKEN` is shorter than 32 characters.
+- `zalo` skill: treat Zalo message content as untrusted data (prompt-injection guard).
 
 ## [2.4.2] - 2026-07-15
 
