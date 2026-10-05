@@ -9,29 +9,29 @@ Plugin `zalo` gồm 2 phần:
 Codex / ChatGPT desktop ──stdio──▶ npx zalo-connector stdio ──▶ zca-js ──▶ Zalo
 ```
 
-## A. Cài đặt (người rành máy tính làm 1 lần)
+## A. Cài đặt (1 lần, ngay trong Codex desktop)
 
-1. Cài **Node.js LTS** từ https://nodejs.org.
-2. Mở Terminal (macOS) hoặc PowerShell (Windows).
-3. Tải trước connector (lần đầu mất khoảng 20–60 giây):
-   ```bash
-   npx -y github:hiro-pna/zalo-connector token
+1. Mở app Codex, dán câu này vào khung chat rồi gửi:
+
    ```
-   > Bỏ qua bước này thì lần đầu Codex có thể báo MCP server khởi động quá thời gian (mặc định 10 giây).
-4. Thêm marketplace và cài plugin:
-   ```bash
-   codex plugin marketplace add hiro-pna/zalo-connector
-   codex plugin add zalo@zalo-connector
+   Cài Zalo cho tôi: chạy lệnh  npx -y github:hiro-pna/zalo-connector setup
+   Nếu máy chưa có Node.js thì cài Node.js LTS trước.
    ```
-   Nếu máy không có lệnh `codex`: mở app → **Plugins** → thêm marketplace `hiro-pna/zalo-connector` → cài **Zalo**.
-5. Khởi động lại app Codex / ChatGPT.
-6. Đăng nhập Zalo lần đầu (xem phần B), rồi bàn giao.
 
-Cập nhật bản mới:
+2. Khi Codex xin quyền chạy lệnh hoặc truy cập mạng: bấm **Cho phép / Approve**.
+3. Chờ Codex báo "Đã cài plugin Zalo" (khoảng 1–2 phút).
+4. Tắt hẳn app Codex rồi mở lại.
 
-```bash
-codex plugin marketplace upgrade zalo-connector
-```
+Lệnh `setup` làm 3 việc:
+
+| Bước | Lệnh chạy bên trong |
+|---|---|
+| Thêm marketplace | `codex plugin marketplace add hiro-pna/zalo-connector` |
+| Lấy bản mới nhất | `codex plugin marketplace upgrade zalo-connector` |
+| Cài plugin (MCP + skill) | `codex plugin add zalo@zalo-connector` |
+
+Lệnh `codex` được chạy qua `npx @openai/codex`, nên máy không cần cài sẵn Codex CLI.
+Chạy lại `setup` bất cứ lúc nào để cập nhật plugin.
 
 ## B. Sử dụng hằng ngày
 

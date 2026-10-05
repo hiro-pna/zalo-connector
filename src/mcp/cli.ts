@@ -1,3 +1,4 @@
+import { spawnSync } from "node:child_process";
 import { randomBytes } from "node:crypto";
 import * as fs from "node:fs";
 import { LoginQRCallbackEventType } from "zca-js";
@@ -9,6 +10,7 @@ import { buildMcpServer, startMcpServer } from "./server.js";
 const USAGE = `Usage: zalo-mcp <command>
 
 Commands:
+  setup    Install the zalo plugin (MCP server + skill) into Codex / ChatGPT desktop
   login    Scan a QR code with the Zalo app and save credentials
   logout   Delete saved credentials
   stdio    Run as a local MCP server over stdio (Codex / ChatGPT desktop, Claude Desktop)
@@ -21,6 +23,35 @@ Environment (serve):
   ZALO_MCP_TOKEN           Required secret. Endpoint: /mcp/<token> or Bearer header
   ZALO_MCP_ALLOW_NO_AUTH=1 Run without a token (anyone with the URL controls your Zalo)
 `;
+
+const MARKETPLACE_REPO = "hiro-pna/zalo-connector";
+
+/** Run the Codex CLI via npx, so no global `codex` install is needed. */
+function codex(args: string[]): boolean {
+  console.log(`> codex ${args.join(" ")}`);
+  const r = spawnSync("npx", ["-y", "@openai/codex@latest", ...args], {
+    stdio: "inherit",
+    shell: process.platform === "win32",
+  });
+  return r.status === 0;
+}
+
+function setup(): void {
+  const refIdx = process.argv.indexOf("--ref");
+  const ref = refIdx > 0 ? process.argv[refIdx + 1] : undefined;
+  const marketplaceArgs = ["plugin", "marketplace", "add", MARKETPLACE_REPO, ...(ref ? ["--ref", ref] : [])];
+
+  const ok =
+    codex(marketplaceArgs) &&
+    codex(["plugin", "marketplace", "upgrade", "zalo-connector"]) &&
+    codex(["plugin", "add", "zalo@zalo-connector"]);
+
+  if (!ok) {
+    console.error("\nCài plugin thất bại. Xem lỗi ở trên.");
+    process.exit(1);
+  }
+  console.log("\nĐã cài plugin Zalo. Khởi động lại app Codex, rồi gõ: Đăng nhập Zalo");
+}
 
 async function login(): Promise<void> {
   let qrFile: string | null = null;
@@ -67,6 +98,9 @@ async function stdio(): Promise<void> {
 
 const command = process.argv[2];
 switch (command) {
+  case "setup":
+    setup();
+    break;
   case "login":
     await login();
     process.exit(0);
