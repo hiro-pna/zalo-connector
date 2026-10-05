@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, unlinkSync, existsSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, unlinkSync, existsSync, mkdirSync, chmodSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { homedir } from "node:os";
 
@@ -12,8 +12,10 @@ export type ZaloPersonalCredentials = {
 };
 
 export function saveCredentials(data: ZaloPersonalCredentials): void {
-  mkdirSync(dirname(CREDENTIALS_PATH), { recursive: true });
-  writeFileSync(CREDENTIALS_PATH, JSON.stringify(data, null, 2), "utf-8");
+  mkdirSync(dirname(CREDENTIALS_PATH), { recursive: true, mode: 0o700 });
+  // Session cookies grant full account access: keep them owner-only.
+  writeFileSync(CREDENTIALS_PATH, JSON.stringify(data, null, 2), { encoding: "utf-8", mode: 0o600 });
+  chmodSync(CREDENTIALS_PATH, 0o600);
 }
 
 export function loadCredentials(): ZaloPersonalCredentials | null {

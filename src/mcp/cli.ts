@@ -75,6 +75,9 @@ async function serve(): Promise<void> {
     console.error("ZALO_MCP_TOKEN is required. Generate one with: zalo-mcp token");
     process.exit(1);
   }
+  if (token && token.length < 32) {
+    console.error("Warning: ZALO_MCP_TOKEN is shorter than 32 characters. Use: zalo-mcp token");
+  }
   if (!hasStoredCredentials()) {
     console.error("No Zalo credentials found. Run: zalo-mcp login");
     process.exit(1);
@@ -83,7 +86,8 @@ async function serve(): Promise<void> {
   await loginWithCredentials();
   startMcpServer({ host, port, token });
 
-  const path = token ? `/mcp/${token}` : "/mcp";
+  // Never print the token: server logs (Docker, Railway, tunnels) are often shared.
+  const path = token ? "/mcp/<ZALO_MCP_TOKEN>" : "/mcp";
   console.log(`Zalo MCP server listening on http://${host}:${port}${path}`);
   console.log("Expose it over HTTPS (e.g. cloudflared, ngrok) and add that URL as a ChatGPT connector.");
 }
