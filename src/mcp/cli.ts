@@ -34,10 +34,10 @@ const MARKETPLACE_REPO = "hiro-pna/zalo-connector";
 const CODEX_CLI = "@openai/codex@0.160.0";
 
 /** Run the Codex CLI via npx, so no global `codex` install is needed. */
-function codex(args: string[]): boolean {
-  console.log(`> codex ${args.join(" ")}`);
+function codex(args: string[], quiet = false): boolean {
+  if (!quiet) console.log(`> codex ${args.join(" ")}`);
   const r = spawnSync("npx", ["-y", CODEX_CLI, ...args], {
-    stdio: "inherit",
+    stdio: quiet ? "ignore" : "inherit",
     shell: process.platform === "win32",
   });
   return r.status === 0;
@@ -88,7 +88,7 @@ async function setup(): Promise<void> {
     process.exit(1);
   }
   // Re-add so a re-run moves the pin to the new commit (add alone keeps the old ref).
-  codex(["plugin", "marketplace", "remove", "zalo-connector"]);
+  codex(["plugin", "marketplace", "remove", "zalo-connector"], true); // fails harmlessly on first install
   const ok =
     codex(["plugin", "marketplace", "add", MARKETPLACE_REPO, "--ref", ref]) &&
     codex(["plugin", "add", "zalo@zalo-connector"]);
