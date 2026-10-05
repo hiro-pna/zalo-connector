@@ -9,7 +9,9 @@ All notable changes to the zalo-personal OpenClaw extension will be documented i
   - CLI commands: `login` (QR), `logout`, `serve`, `token`.
   - Auth: shared secret `ZALO_MCP_TOKEN` via `/mcp/<token>` path or `Authorization: Bearer` header.
   - `GET /healthz` endpoint.
-- `Dockerfile` and `CHATGPT.md` setup guide.
+- **STDIO mode** (`zalo-mcp stdio`) for Codex / ChatGPT desktop: Codex launches it via `npx -y github:hiro-pna/zalo-connector stdio`; no server, tunnel or token.
+- **`zalo_login` / `zalo_login_status` tools**: QR login from inside the chat; the QR opens in the OS image viewer and is also returned as an image.
+- `Dockerfile`, `CHATGPT.md` and `CODEX.md` setup guides.
 - GitHub Actions workflow that creates a GitHub Release with the `npm pack` tarball on `v*` tags.
 
 ### Changed

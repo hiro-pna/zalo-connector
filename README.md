@@ -15,9 +15,10 @@ Zalo App  <-->  zalo-personal extension  <-->  OpenClaw AI  <-->  Bạn
 
 ---
 
-## Dùng Với ChatGPT (MCP)
+## Dùng Với Codex / ChatGPT (MCP)
 
-Xem [CHATGPT.md](CHATGPT.md) để chạy MCP server và thêm connector trong ChatGPT.
+- **Codex / ChatGPT desktop (dễ nhất):** xem [CODEX.md](CODEX.md). Không cần server.
+- **ChatGPT web (connector qua HTTPS):** xem [CHATGPT.md](CHATGPT.md).
 
 ## Cài Đặt Nhanh
 
