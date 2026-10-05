@@ -20,7 +20,7 @@ function openWithSystemViewer(file: string): void {
     process.platform === "darwin"
       ? ["open", [file]]
       : process.platform === "win32"
-        ? ["cmd", ["/c", "start", "", file]]
+        ? ["explorer.exe", [file]] // not cmd.exe: avoids shell parsing of the path
         : ["xdg-open", [file]];
   try {
     const child = spawn(cmd, args as string[], { detached: true, stdio: "ignore" });
@@ -38,7 +38,9 @@ function openWithSystemViewer(file: string): void {
 export async function startQrLogin(opts: { openViewer: boolean }): Promise<LoginState> {
   if (state.status === "waiting") return state;
 
-  const qrPath = path.join(os.tmpdir(), "zalo-connector-qr.png");
+  // Private per-login dir: no predictable path in a shared /tmp (symlink overwrite, QR snooping).
+  const qrDir = fs.mkdtempSync(path.join(os.tmpdir(), "zalo-connector-"));
+  const qrPath = path.join(qrDir, "qr.png");
   let retries = 0;
 
   return new Promise<LoginState>((resolve) => {
@@ -54,7 +56,7 @@ export async function startQrLogin(opts: { openViewer: boolean }): Promise<Login
     loginWithQR((event) => {
       switch (event.type) {
         case LoginQRCallbackEventType.QRCodeGenerated: {
-          fs.writeFileSync(qrPath, Buffer.from(event.data.image, "base64"));
+          fs.writeFileSync(qrPath, Buffer.from(event.data.image, "base64"), { mode: 0o600 });
           if (opts.openViewer) openWithSystemViewer(qrPath);
           settle({ status: "waiting", qrPath, qrBase64: event.data.image });
           break;
@@ -72,10 +74,11 @@ export async function startQrLogin(opts: { openViewer: boolean }): Promise<Login
       }
     })
       .then(() => {
-        fs.rmSync(qrPath, { force: true });
+        fs.rmSync(qrDir, { recursive: true, force: true });
         settle({ status: "done" });
       })
       .catch((err) => {
+        fs.rmSync(qrDir, { recursive: true, force: true });
         settle({ status: "failed", error: err instanceof Error ? err.message : String(err) });
       });
   });

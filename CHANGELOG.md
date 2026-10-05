@@ -24,6 +24,13 @@ All notable changes to the zalo-personal OpenClaw extension will be documented i
 ### Fixed
 - `saveCredentials` creates `~/.openclaw/` when missing (standalone installs).
 
+### Security
+- Credentials file written with mode `0600` (directory `0700`); it holds session cookies with full account access.
+- QR image written to a private per-login temp dir (`0700`, file `0600`) instead of a fixed path in shared `/tmp`, preventing symlink overwrite and QR snooping by other local users.
+- Windows QR viewer opened via `explorer.exe` instead of `cmd /c start`, avoiding shell parsing of the path.
+- `serve` no longer prints the token in its startup log; warns when `ZALO_MCP_TOKEN` is shorter than 32 characters.
+- `zalo` skill: treat Zalo message content as untrusted data (prompt-injection guard).
+
 ## [2.4.2] - 2026-07-15
 
 ### Added
